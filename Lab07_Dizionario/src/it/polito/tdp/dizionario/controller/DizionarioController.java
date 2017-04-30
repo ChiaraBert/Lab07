@@ -1,8 +1,11 @@
 package it.polito.tdp.dizionario.controller;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.dizionario.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -11,6 +14,8 @@ import javafx.scene.control.TextField;
 
 public class DizionarioController {
 
+	
+	private Model m;
 	@FXML
 	private ResourceBundle resources;
 	@FXML
@@ -27,17 +32,39 @@ public class DizionarioController {
 	private Button btnTrovaVicini;
 	@FXML
 	private Button btnTrovaGradoMax;
+	
+	private int numeroLettere=0;
 
+	void setModel(Model m){
+		this.m=m;
+	}
+	
 	@FXML
 	void doReset(ActionEvent event) {
-		txtResult.setText("Reset!");
+		txtResult.clear();
+		inputNumeroLettere.clear();
+		inputParola.clear();
+		
 	}
 
 	@FXML
 	void doGeneraGrafo(ActionEvent event) {
 
 		try {
-			txtResult.setText("Controller -- TODO!");
+			String lunghezza="";
+			lunghezza=inputNumeroLettere.getText();
+			
+			if(lunghezza.matches("[a-zA-Z]*")){
+				txtResult.setText("Inserire solo caratteri numerici");
+				return;}
+			
+			numeroLettere=Integer.parseInt(lunghezza);
+			
+			if(numeroLettere<2||numeroLettere>5){
+				txtResult.setText("Numero di lettere troppo grande");
+				return;}
+			
+			m.createGraph(numeroLettere);
 			
 		} catch (RuntimeException re) {
 			txtResult.setText(re.getMessage());
@@ -47,8 +74,19 @@ public class DizionarioController {
 	@FXML
 	void doTrovaGradoMax(ActionEvent event) {
 		
-		try {
-			txtResult.setText("Controller -- TODO!");
+		try { String parola="";
+			
+			List<String> vicini = new ArrayList<String>();
+			
+				if(numeroLettere==0){
+				txtResult.setText("Stabilire prima la lunghezza delle parole");
+				return;}
+				
+			parola=m.findMaxDegree();
+			vicini=m.displayNeighbours(parola);
+				
+			txtResult.setText("Grado Massimo:\n"+parola+": grado "+vicini.size()+"\nVicini: "+vicini);
+			
 
 		} catch (RuntimeException re) {
 			txtResult.setText(re.getMessage());
@@ -58,8 +96,23 @@ public class DizionarioController {
 	@FXML
 	void doTrovaVicini(ActionEvent event) {
 		
-		try {
-			txtResult.setText("Controller -- TODO!");
+		try {String parola = "";
+			
+			List<String> vicini = new ArrayList<String>();
+			parola=inputParola.getText();
+			
+			if(numeroLettere==0){
+				txtResult.setText("Stabilire prima la lunghezza delle parole");
+				return;}
+			
+			if(parola.length()!= numeroLettere){
+				txtResult.setText("La parola deve essere lunga "+numeroLettere);
+				return;}
+			
+			vicini=m.displayNeighbours(parola);
+			
+			txtResult.setText(""+vicini);
+			
 
 		} catch (RuntimeException re) {
 			txtResult.setText(re.getMessage());
